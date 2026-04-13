@@ -17,15 +17,19 @@ Phase 0 intake: purpose = "developer onboarding", artifact set = "full set".
 ## l1-c4-context.md (excerpt)
 
 ```mermaid
-C4Context
-    title System Context - url-shortener
-    Person(user, "Shell user")
-    System(shortener, "url-shortener", "CLI: expands short URLs")
-    System_Ext(api, "ul.example API", "HTTPS endpoint for short-id lookup")
-    System_Ext(cache_store, "SQLite cache", "~/.cache/urlshort.db")
-    Rel(user, shortener, "Runs: urlshort <short>")
-    Rel(shortener, api, "GET /<id>", "HTTPS, 5s timeout")
-    Rel(shortener, cache_store, "Read/write expanded URLs", "sqlite3")
+flowchart TD
+    classDef person fill:#08427b,color:#fff,stroke:#073b6f
+    classDef system fill:#1168bd,color:#fff,stroke:#0f5ca8
+    classDef external fill:#999,color:#fff,stroke:#8a8a8a
+
+    user["Shell user"]:::person
+    shortener["url-shortener<br/><i>CLI: expands short URLs</i>"]:::system
+    api["ul.example API<br/><i>HTTPS endpoint for short-id lookup</i>"]:::external
+    cache_store["SQLite cache<br/><i>~/.cache/urlshort.db</i>"]:::external
+
+    user -->|"urlshort &lt;short&gt;"| shortener
+    shortener -->|"GET /&lt;id&gt; · HTTPS, 5s timeout"| api
+    shortener -->|"Read/write expanded URLs · sqlite3"| cache_store
 ```
 
 ## l2-c4-container.md (excerpt)
@@ -37,14 +41,16 @@ Single process, single thread. Runtime containers:
 ## l3-c4-component.md (excerpt)
 
 ```mermaid
-C4Component
-    title Components - CLI Process
-    Component(cli, "CLI", "main.py", "Parses argv, orchestrates lookup, prints result")
-    Component(client, "Client", "client.py", "Issues GET, retries, timeouts")
-    Component(cache, "Cache", "cache.py", "Reads/writes SQLite entries with 24h TTL")
-    Rel(cli, cache, "get(short_id)")
-    Rel(cli, client, "expand(short_id)", "on cache miss")
-    Rel(cache, client, "store(short_id, long_url)", "on fresh fetch")
+flowchart TD
+    classDef component fill:#85bbf0,color:#000,stroke:#78a8d8
+
+    cli["CLI<br/><i>main.py — Parses argv, orchestrates lookup, prints result</i>"]:::component
+    client["Client<br/><i>client.py — Issues GET, retries, timeouts</i>"]:::component
+    cache["Cache<br/><i>cache.py — Reads/writes SQLite entries with 24h TTL</i>"]:::component
+
+    cli -->|"get(short_id)"| cache
+    cli -->|"expand(short_id) · on cache miss"| client
+    cache -->|"store(short_id, long_url) · on fresh fetch"| client
 ```
 
 ## behavioral-spec.md (excerpt — §9 Degradation)

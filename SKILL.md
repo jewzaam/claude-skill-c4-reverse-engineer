@@ -34,9 +34,22 @@ All output goes to `docs/c4/` in the project directory:
 | `behavioral-spec.md` | Full behavioral specification |
 | `Review-c4-validation.md` | Quality record documenting what was verified |
 
-Diagrams use Mermaid C4 notation (`C4Context`, `C4Container`, `C4Component`). Include ASCII
-fallback for the primary data flow diagram. Note in output: "Mermaid C4 may not render in all
-viewers."
+Diagrams use standard Mermaid `flowchart` notation with `classDef` styling to distinguish C4
+element types. Include ASCII fallback for the primary data flow diagram. Use these class
+definitions at the top of every diagram:
+
+```mermaid
+flowchart TD
+    classDef person fill:#08427b,color:#fff,stroke:#073b6f
+    classDef system fill:#1168bd,color:#fff,stroke:#0f5ca8
+    classDef external fill:#999,color:#fff,stroke:#8a8a8a
+    classDef container fill:#438dd5,color:#fff,stroke:#3c7ebc
+    classDef component fill:#85bbf0,color:#000,stroke:#78a8d8
+    classDef store fill:#438dd5,color:#fff,stroke:#3c7ebc,stroke-dasharray: 5 5
+```
+
+Apply classes to nodes: `NodeId["Label<br/><i>description</i>"]:::person`. Use `<br/>` and
+`<i>` tags for multi-line labels with technology descriptions.
 
 ## Workflow — 7 Phases
 
@@ -181,24 +194,12 @@ any level the user didn't request:
 - **L3 Component**: Behavioral decomposition per container. Include event-to-state mapping
   tables, data flow summaries
 
-**Mermaid C4 character pitfalls.** The Mermaid C4 plugin (tested on 11.x) is stricter
-than standard Mermaid — labels fail to parse with characters that work fine elsewhere.
-Keep labels ASCII-plain:
+**Diagram styling conventions:**
 
-- **No inner parentheses** inside quoted labels. `System_Ext(id, "Foo (Bar)", ...)` breaks
-  the parser; use `"Foo - Bar"` or move "(Bar)" into the description string after a dash.
-- **No backslashes**. `"HKCU\\...\\Run"` is treated as an escape. Use forward slashes or
-  prose: `"HKCU Run key"`.
-- **No angle brackets** `< >` in labels — they can be interpreted as HTML tags when the
-  rendered SVG is embedded. Use words: `"code cwd"` not `"code <cwd>"`.
-- **Avoid pipe character** `|` inside labels — it's a table separator in the surrounding
-  markdown and confuses some renderers.
-- **Em dashes and smart quotes are fine in titles and descriptions** but some
-  md2html/mermaid pipelines mangle them. When in doubt, ASCII.
-
-After writing each diagram, mentally re-scan the labels for these characters. A diagram
-that displays "Syntax error in text" is worse than a plain one — the reader can't even
-see the structure.
+- Use `["Label<br/><i>tech/description</i>"]` for multi-line node labels
+- Edge labels go in `|label|` syntax: `A -->|"HTTPS, JSON"| B`
+- Group related nodes with `subgraph` blocks for containers in L2/L3 diagrams
+- Keep node IDs short and lowercase (`api`, `db`, `cli`); put readable names in the label
 
 ### Phase 5: Behavioral Spec Generation
 
