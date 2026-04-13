@@ -5,7 +5,7 @@ description: >
   specification from a codebase. Produces documentation of WHAT the system does — not how it's
   coded.
 disable-model-invocation: true
-allowed-tools: Bash(~/.claude/skills/c4-reverse-engineer/scripts/*), Read(~/.claude/skills/c4-reverse-engineer/references/*)
+allowed-tools: Bash(${CLAUDE_SKILL_DIR}/scripts/*), Bash(python ${CLAUDE_SKILL_DIR}/scripts/*), Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/*), Read(${CLAUDE_SKILL_DIR}/references/*)
 
 ---
 
